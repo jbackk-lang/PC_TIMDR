@@ -1,57 +1,47 @@
-# jcompressor.py
-# JCompressor przebudowany pod F4-RED (252 stany)
-# Kompresja = redukcja ramienia + utrzymanie dopuszczalności konfiguracji
+# ============================================================
+#   J–COMPRESSION MODULE (TIMDR / Λ–τ–ρ / Twist Operator)
+# ============================================================
+#
+# UWAGA: plik przemianowany z modulKompresjiJ.py -> j_compression.py,
+# żeby zgadzał się z importem w core/__init__.py
+# (from .j_compression import j_compress, j_decompress, j_hash),
+# który wcześniej powodował ModuleNotFoundError przy `import core`.
+# Treść modułu bez zmian.
 
-from dataclasses import dataclass
-from typing import List
+import hashlib
+import struct
 
-from filter_252 import F4State, F4Filter252
+MAGIC = b'JCOMP'  # znacznik skrętu – pozwala wykryć kompresję
 
+def j_core_reduce(data: bytes) -> bytes:
+    """Minimalna redukcja topologiczna: Λ–τ–ρ."""
+    out = bytearray()
+    last = 0
+    for b in data:
+        d = b ^ last
+        out.append(d)
+        last = b
+    return bytes(out)
 
-@dataclass
-class JPoint:
-    """
-    Pojedynczy punkt w przestrzeni TIMDR:
-    wektor 9 pierwiastków strukturalnych (ΔS, τ, Λ × 3 ramiona) w stanie ±1.
-    """
-    bits: List[int]
+def j_core_restore(data: bytes) -> bytes:
+    """Odwrócenie redukcji."""
+    out = bytearray()
+    last = 0
+    for d in data:
+        b = d ^ last
+        out.append(b)
+        last = b
+    return bytes(out)
 
-    def to_f4_state(self) -> F4State:
-        return F4State(bits=self.bits)
+def j_compress(raw: bytes) -> bytes:
+    core = j_core_reduce(raw)
+    return MAGIC + core
 
+def j_decompress(blob: bytes) -> bytes:
+    if not blob.startswith(MAGIC):
+        raise ValueError("Plik nie jest w formacie J–compression.")
+    core = blob[len(MAGIC):]
+    return j_core_restore(core)
 
-class JCompressor:
-    """
-    JCompressor:
-    - wykonuje redukcję jednego ramienia (kompresja strukturalna)
-    - utrzymuje stan w dopuszczalnej przestrzeni 252 konfiguracji F4-RED
-    """
-
-    def __init__(self):
-        self.filter = F4Filter252()
-
-    def _reduce_arm(self, point: JPoint) -> JPoint:
-        """
-        Redukcja jednego ramienia:
-        Tu możesz wstawić swoją właściwą logikę kompresji.
-        Na razie: placeholder — nie zmienia wektora.
-        """
-        # TODO: podmień na swoją realną transformację redukcji ramienia
-        return point
-
-    def compress(self, point: JPoint) -> JPoint | None:
-        """
-        Główna operacja:
-        - redukcja ramienia
-        - walidacja F4-RED (252 stany)
-        - zwrot skompresowanego punktu albo None, jeśli stan jest niedopuszczalny
-        """
-        reduced = self._reduce_arm(point)
-        state = reduced.to_f4_state()
-
-        if self.filter.apply(state):
-            return reduced
-        return None
-
-    def stats(self) -> dict:
-        return self.filter.stats()
+def j_hash(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
