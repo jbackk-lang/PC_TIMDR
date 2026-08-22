@@ -1,3 +1,33 @@
+> **[PROJEKT PRZENIESIONY]** Ten model (1-procesorowy rdzeń geometryczny
+> State9 / F4-RED, 252 dopuszczalne stany) nie jest już rozwijany w tym
+> repozytorium. Został przeniesiony i rozszerzony w
+> **[jbackk-lang/KHIPU](https://github.com/jbackk-lang/KHIPU)**:
+>
+> - odpowiednik modelu 1-procesorowego z tego repo żyje tam jako
+>   `khipu/pipeline.py::SingleCPUSystem` (`MODEL_PC.md`),
+> - doszło **rozszerzenie do 4 procesorów**, którego tu nigdy nie
+>   było: `khipu/tetragon.py::TetragonSystem` + `khipu/axis.py`
+>   (wspólny węzeł `NODE_AXIS`, figury rezonansowe trójkąt/tetragon)
+>   + `khipu/rope48.py` — opisane w `MODEL_TETRAGON_4CPU.md` w KHIPU,
+> - oba modele (1-CPU i 4-CPU) są tam realnie zaimplementowane i
+>   pokryte testami (56 testów w `tests/`), nie tylko opisane.
+>
+> Powód porzucenia tego repo: według własnej notatki autora, wyliczenia
+> pokazały, że szersza architektura słowa byłaby wydajniejsza niż
+> podejście 8/16-bitowe (State9, adresacja 0-255) opisane poniżej -
+> stąd dalsza praca poszła w kierunku modelu w KHIPU zamiast tutaj.
+>
+> To repozytorium zostaje jako **archiwum wcześniejszej wersji
+> koncepcji**. Kod: `filter_252.py` i `jcompressor.py` (`_reduce_arm`)
+> są realnie zaimplementowane; `motion.py`, `rotation.py`, `tetroid.py`,
+> `triangle.py`, `twist_operator.py`, `skret_ai.py`, `memory.py` to
+> zaślepki przepuszczające stan bez zmian (patrz komentarze
+> `TODO: podmień na swoją realną transformację` w kodzie) - opisana w
+> dalszej części README warstwa ISA/OS/VM/Apps nie ma odpowiednika w
+> kodzie. **Szukaj aktywnej wersji w KHIPU.**
+
+---
+
 ## 🔗 Wszystkie modele i repozytoria
 Pełna lista projektów znajduje się na stronie:
 https://jbackk-lang.github.io
